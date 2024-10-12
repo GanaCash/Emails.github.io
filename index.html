@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar Email con MailerLite</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+            border-radius: 5px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 45%;
+            height: 300px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: none;
+        }
+        .preview {
+            width: 45%;
+            height: 300px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: white;
+            overflow-y: auto;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Enviar Email con MailerLite</h1>
+    <div class="container">
+        <textarea id="htmlInput" placeholder="Escribe tu código HTML aquí..."></textarea>
+        <div class="preview" id="htmlPreview"></div>
+    </div>
+    <input type="email" id="recipient" placeholder="Correo del destinatario" required />
+    <input type="text" id="subject" placeholder="Asunto" required />
+    <button onclick="updatePreview()">Previsualizar</button>
+    <button onclick="sendEmail()">Enviar Correo</button>
+    <div id="responseMessage" style="margin-top: 20px; text-align: center;"></div>
+
+    <script>
+        function updatePreview() {
+            const htmlInput = document.getElementById('htmlInput').value;
+            const htmlPreview = document.getElementById('htmlPreview');
+            htmlPreview.innerHTML = htmlInput; // Actualizar la previsualización
+        }
+
+        function sendEmail() {
+            const recipient = document.getElementById('recipient').value;
+            const subject = document.getElementById('subject').value;
+            const htmlContent = document.getElementById('htmlInput').value;
+
+            // Validar que el campo destinatario no esté vacío
+            if (!recipient) {
+                document.getElementById('responseMessage').innerText = 'Por favor, ingresa un correo electrónico válido del destinatario.';
+                return;
+            }
+
+            // Llamada a la API de MailerLite
+            fetch('https://api.mailerlite.com/api/v2/email/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-MailerLite-ApiKey': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI0IiwianRpIjoiYjNlNzUxYmIyNzE5MWNkZWNmOWRiNjNkODA0Y2Y2NmY0ZTkxMTlhNDEwNWZiMmUxYzIyN2Y1MTVhNzRkMmU0NzZlNmNhYzlkNTYwZWY0OGUiLCJpYXQiOjE3Mjg3NjgyOTIuNzQxMzgxLCJuYmYiOjE3Mjg3NjgyOTIuNzQxMzgzLCJleHAiOjQ4ODQ0NDE4OTIuNzM4ODU0LCJzdWIiOiIxMTUyNjQzIiwic2NvcGVzIjpbXX0.h1UjW2SaDzOeGz0tSFuDwnIU9bbY3T5JShX2ZK7rp9yvrgwPkCKsYugPkhBvRWnYyDCrHa7Hf3T1hg9PAgw5L0paO9I8GC87RH3pVIB5VdQaVivtwxar_s6kKjPq1KIDwhd8UeYEsYSBT1DG7vfZbV6HA1wrsoanGOtAiR06oL2JUZVOV9ZRi9a-EHpWq_T0tVuWvPmhfoNqidWviQxZfUYUeOdZ7N7HZpWP0__WzjISR8l-QVq-vrc-NAaTxqs6oOJY5J-NmUt1arJwnE9aoAwksWTTDg8wjaac8jmGjL6_IgTcU6XfKu1QXD4shk3XcmNIbzt6DlEwVEi9M0Kv5a26rz_6XnY6cmy7f6DGp1S_4IKFjfjQ88N76YeL4-Ls3e6r8zWpebzcrkbsV-zyoWGfWE3Nj81VK9JhcwlSgnr6m7RHT3bJCKmh6rGSBfn-RTqFpc40Ban5cX73Bke3DwpbFMbDcQyEGcs3fD3NtRFMGPw4MzJXsPbtizFUBTmKBecqL-YFLek7T8bEjsk9C06HhlINxQKtXWvoUu3fvJOvBy7_x3GDbiCqOf3UFgujweds-j1c7KZYecVWqgV91_39xtzj6EpCa2chUOZNN8t7YR5fnsvANZH4pS1zs6pHe2YB47fQHieXghQQQB1lmXeLeIAzqmAne78WU-8MPf4' // Reemplaza con tu API Key
+                },
+                body: JSON.stringify({
+                    'from': 'tu_correo_verificado@example.com',  // Reemplaza con tu correo verificado
+                    'to': [recipient],  // Destinatario capturado
+                    'subject': subject,  // Asunto del correo
+                    'html': htmlContent  // Contenido HTML del correo
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success || data.status === 'success') {
+                    document.getElementById('responseMessage').innerText = 'Correo enviado exitosamente!';
+                    document.getElementById('htmlInput').value = '';  // Reiniciar el campo HTML
+                    document.getElementById('recipient').value = '';  // Reiniciar el campo de destinatario
+                    document.getElementById('subject').value = '';  // Reiniciar el campo de asunto
+                    updatePreview();  // Reiniciar la previsualización
+                } else {
+                    throw new Error('Error al enviar el correo: ' + data.message);
+                }
+            })
+            .catch(error => {
+                document.getElementById('responseMessage').innerText = error.message;
+            });
+        }
+    </script>
+
+</body>
+</html>
